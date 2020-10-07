@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <script src="https://wow.techbrood.com/libs/jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript">
+        $(".hover").mouseleave(
+            function () {
+                $(this).removeClass("hover");
+            }
+        );
+    </script>
+    <style>
+        .progress {
+            height: 10px;
+            background: #ebebeb;
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+            border-radius: 10px;
+        }
+
+        .progress > span {
+            position: relative;
+            float: left;
+            margin: 0 -1px;
+            min-width: 30px;
+            height: 10px;
+            line-height: 16px;
+            text-align: right;
+            background: #cccccc;
+            border: 1px solid;
+            border-color: #bfbfbf #b3b3b3 #9e9e9e;
+            border-radius: 10px;
+            background-image: -webkit-linear-gradient(top, #f0f0f0 0%, #dbdbdb 70%, #cccccc 100%);
+            background-image: -moz-linear-gradient(top, #f0f0f0 0%, #dbdbdb 70%, #cccccc 100%);
+            background-image: -o-linear-gradient(top, #f0f0f0 0%, #dbdbdb 70%, #cccccc 100%);
+            background-image: linear-gradient(to bottom, #f0f0f0 0%, #dbdbdb 70%, #cccccc 100%);
+            -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress .orange {
+            background: #FE8E01;
+            border-color: #FE8E02 #FE8E02 #BF6B02;
+            background-image: -webkit-linear-gradient(top, #FEAA41 0%, #FE8E02 70%, #FE8E01 100%);
+            background-image: -moz-linear-gradient(top, #FEAA41 0%, #FE8E02 70%, #FE8E01 100%);
+            background-image: -o-linear-gradient(top, #FEAA41 0%, #FE8E02 70%, #FE8E01 100%);
+            background-image: linear-gradient(to bottom, #FEAA41 0%, #FE8E02 70%, #FE8E01 100%);
+        }
+
+        @import url(https://fonts.googleapis.com/css?family=Roboto);
+        .snip1544 {
+            font-family: 'Roboto', Arial, sans-serif;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0px 40px;
+            display: inline-block;
+            margin: 15px 30px;
+            text-transform: uppercase;
+            line-height: 2.7em;
+            letter-spacing: 1.5px;
+            font-size: 1em;
+            outline: none;
+            position: relative;
+            font-size: 16px;
+            border: 3px solid #fff;
+            background-color: transparent;
+            border-radius: 0 15px 15px;
+            -webkit-transition: all 0.3s;
+            transition: all 0.3s;
+        }
+
+        .snip1544:before {
+            content: "";
+            position: absolute;
+            right: -3px;
+            bottom: -3px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 35px 35px;
+            border-color: transparent transparent #c87f0a transparent;
+            z-index: 1;
+        }
+
+        .snip1544:hover,
+        .snip1544.hover {
+            border-color: #c87f0a;
+        }
+
+        /* Demo purposes only */
+
+        body {
+            background-color: #212121;
+            padding: 50px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<div>
+    <label>
+        <input class="snip1544">
+    </label>
+    <button class="snip1544" style="float: none" id="submit">开始</button>
+    <button class="snip1544" style="float: none" id="clearMessage">清除</button>
+</div>
+<div th:each="data : ${data}">
+    <div style="color: white" th:text="${data.threadName}"></div>
+    <div class="progress" style="height: 25px;line-height: 25px;width: 60%;text-align: center;margin: auto">
+        <span class="orange" style="width: 0;height: 20px" id="progress">0 / 0</span>
+    </div>
+    <button class="snip1544" style="float: right" th:onclick="tryStop([[${data.threadName}]])">停止</button>
+    <p id="result" style="color: white" th:text="${data.msg}"></p>
+</div>
+<script type="text/javascript" th:inline="javascript">
+    let curWwwPath = window.document.location.href;
+    let pathName = window.document.location.pathname;
+    let pos = curWwwPath.indexOf(pathName);
+    //获取主机地址，如： http://localhost:8083
+    let ctxPath = curWwwPath.substring(0, pos);
+    let showMessageTag = null;
+    $("#submit").click(function () {
+        const url = ctxPath + "/executionTool/start";
+        $.ajax({
+            url: url,
+            method: "get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "text",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+        showMessageTag = setInterval(showMessage, 1000);
+    });
+
+    let data = [[${data}]];
+    let flush = [[${flush}]];
+    if (data && flush) {
+        showMessageTag = setInterval(showMessage, 1000);
+    }
+
+    function tryStop(threadName) {
+        const url = ctxPath + "/executionTool/tryStop";
+        $.ajax({
+            url: url,
+            data: threadName,
+            method: "post",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "application/json",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+        clearInterval(showMessageTag);
+    }
+
+    function showMessage() {
+        window.location.href = ctxPath + "/executionTool/getMessage";
+    }
+
+    $("#clearMessage").click(function () {
+        document.getElementById("result").innerHTML = "";
+        const url = ctxPath + "/executionTool/clearMessage";
+        $.ajax({
+            url: url,
+            method: "get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "text",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+    });
+</script>
+</html>

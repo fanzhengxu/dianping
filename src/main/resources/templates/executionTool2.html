@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>执行工具</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+<div th:utext="${htmlContent}">
+</div>
+
+</body>
+<script type="text/javascript" th:inline="javascript">
+    let curWwwPath = window.document.location.href;
+    let pathName = window.document.location.pathname;
+    let pos = curWwwPath.indexOf(pathName);
+    //获取主机地址，如： http://localhost:8083
+    let ctxPath = curWwwPath.substring(0, pos);
+    let showMessageTag = null;
+    $("#start").click(function () {
+        const url = ctxPath + "/executionTool/start";
+        $.ajax({
+            url: url,
+            method: "get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "text",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+        showMessageTag = setInterval(showMessage, 1000);
+    });
+
+    let flush = [[${ flush }]];
+    if (flush) {
+        showMessageTag = setInterval(showMessage, 1000);
+    }
+
+    function tryStop(threadName) {
+        const url = ctxPath + "/executionTool/tryStop";
+        $.ajax({
+            url: url,
+            data: threadName,
+            method: "post",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "application/json",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+        clearInterval(showMessageTag);
+    }
+
+    function showMessage() {
+        window.location.href = ctxPath + "/executionTool/getMessage";
+    }
+
+    $("#clearMessage").click(function () {
+        const url = ctxPath + "/executionTool/clearMessage";
+        $.ajax({
+            url: url,
+            method: "get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "text",
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                }
+            }
+        });
+    });
+</script>
+
+</html>
